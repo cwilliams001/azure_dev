@@ -1,6 +1,6 @@
-# Azure VM Deployment with Terraform
+# Azure VM Deployment with Terraform and WireGuard Setup with Ansible
 
-This repository contains Terraform configurations to deploy virtual machines in Azure. Before you begin, ensure you have the necessary prerequisites installed and configured.
+This repository contains Terraform configurations to deploy virtual machines in Azure and an Ansible playbook to set up a WireGuard VPN server on the VMs. Before you begin, ensure you have the necessary prerequisites installed and configured.
 
 ## Prerequisites
 
@@ -13,10 +13,14 @@ This repository contains Terraform configurations to deploy virtual machines in 
       Follow the prompts to complete the login process.
 
 2. **SSH Keypair**:
-    - You will need an SSH keypair to securely access the deployed VMs.
+    - You will need an SSH keypair to securely access the deployed VMs and for Ansible to communicate with the VMs.
     - If you do not have an SSH keypair, you can generate one by running the following command in your terminal:
       ```bash
       ssh-keygen -t rsa -b 4096 -f ~/.ssh/dev-azure
+      ```
+
+3. **Ansible**:
+    - Install Ansible by following the instructions on the [official website](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html).
       ```
 
 ## Understanding the Terraform Configuration
@@ -59,3 +63,44 @@ To destroy the deployed resources, you can use the following command:
 ```bash
 terraform destroy
 ```
+
+## Understanding the Ansible Playbook
+
+The Ansible playbook `docker-wg.yml` sets up a WireGuard VPN server on the deployed VMs using Docker. Here's a breakdown of its key components:
+
+- **Hosts**: Specifies the target host group where the playbook will be executed.
+- **Variables**: Defines variables used in the playbook, loaded from `vars.yml`.
+- **Tasks**:
+  - Sets up directories for Docker volume mapping.
+  - Installs Docker.
+  - Pulls the WireGuard Docker image.
+  - Runs the WireGuard container with specified environment variables and settings.
+  - Fetches peer configuration files and QR code files to the local machine for distributing to VPN clients.
+
+The `ansible.cfg` file contains configuration settings for Ansible, including the path to the inventory file, SSH key, and remote user.
+
+The `vars.yml` file contains variables used in the playbook, such as the directory paths and the number of VPN peers.
+
+## Deployment
+
+### Terraform Deployment
+
+Refer to the previous README section on Terraform deployment.
+
+### Ansible Setup
+
+1. Ensure the VMs are up and running and that you can SSH into them.
+2. Update the `inventory.ini` file with the IP addresses of the VMs.
+3. Run the following command to execute the Ansible playbook and set up WireGuard on the VMs:
+   ```bash
+   ansible-playbook docker-wg.yml
+   ```
+
+## Clean Up
+
+To destroy the deployed resources, you can use the following command:
+
+```bash
+terraform destroy
+```
+
