@@ -21,7 +21,6 @@ This repository contains Terraform configurations to deploy virtual machines in 
 
 3. **Ansible**:
     - Install Ansible by following the instructions on the [official website](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html).
-      ```
 
 ## Understanding the Terraform Configuration
 
