@@ -41,8 +41,10 @@
           SERVERURL: "auto"
           SERVERPORT: "51820"
           PEERS: "{{ number_of_peers | string }}"
-          PEERDNS: "auto"
+          PEERDNS: "1.1.1.1"
           INTERNAL_SUBNET: "10.13.13.0"
+          ALLOWEDIPS: "0.0.0.0/0"
+          PERSISTENTKEEPALIVE_PEERS: "all"
         ports:
           - "51820:51820/udp"
         volumes:

@@ -5,3 +5,4 @@
 *.tfstate
 *.tfstate.*
 .vscode/settings.json
+playbooks/.vscode/settings.json
