@@ -27,6 +27,8 @@ This repository contains Terraform configurations to deploy virtual machines in 
 The main Terraform configuration file is `main.tf`. Here's a breakdown of its key components:
 
 - **Provider Configuration**: This block configures the Azure provider for Terraform.
+- **Modules**: The configuration is modularized into separate modules for network, VM, and DNS.
+- **Variables**: Variables are declared and used to customize the deployment such as the number of VMs, SSH key path, domain name, and record prefix for DNS.
 - **Resource Group**: A resource group is created to organize all the resources.
 - **Virtual Network and Subnet**: These resources create a virtual network and subnet where the VMs will reside.
 - **Network Security Group and Rules**: These resources set up a network security group with a basic rule to control traffic to the VMs.
@@ -36,7 +38,7 @@ The main Terraform configuration file is `main.tf`. Here's a breakdown of its ke
 
 ### Adjusting VM Count
 
-- The `vm_count` value in the `locals` block controls how many VMs will be created. Adjust this value to create more or fewer VMs.
+- Adjustments like the number of VMs, SSH key, domain name, and record prefix can be made in the `terraform.tfvars` file.
 
 ### Source Image Reference
 
