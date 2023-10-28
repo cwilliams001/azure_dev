@@ -1,0 +1,5 @@
+server_url: "${server_url}"
+listen_addr: "0.0.0.0:443"
+acme_email: "${acme_email}"
+tls_letsencrypt_hostname: "${tls_letsencrypt_hostname}"
+base_domain: "${base_domain}"

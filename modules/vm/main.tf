@@ -1,5 +1,5 @@
 locals {
-  vm_names = toset(formatlist("dev-vm-%02d", range(1, var.vm_count + 1)))
+  vm_names = toset(formatlist("${var.vm_name_prefix}-%02d", range(1, var.vm_count + 1)))
 }
 
 

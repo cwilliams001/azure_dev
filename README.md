@@ -59,43 +59,112 @@ The main Terraform configuration file is `main.tf`. Here's a breakdown of its ke
    terraform apply
    ```
 
-To destroy the deployed resources, you can use the following command:
+   To destroy the deployed resources, you can use the following command:
 
-```bash
-terraform destroy
+   ```bash
+   terraform destroy
+   ```
+
+## Docker-WireGuard Setup with Ansible
+
+The Ansible playbook `wg/docker-wg.yml` sets up a WireGuard VPN server on the deployed VMs using Docker. Here’s a breakdown of its key components:
+
+### Directory Structure
+
+```plaintext
+.
+├── ansible.cfg
+└── wg
+    ├── docker-wg.yml
+    ├── scripts
+    │   ├── update_mtu.sh
+    │   └── update_peer_mtu.sh
+    └── vars
+        └── main.yml
 ```
 
-## Understanding the Ansible Playbook
+### Variable Configuration
 
-The Ansible playbook `docker-wg.yml` sets up a WireGuard VPN server on the deployed VMs using Docker. Here's a breakdown of its key components:
+Update the necessary variables in the `wg/vars/main.yml` file before running the playbook. The variables include:
 
-- **Hosts**: Specifies the target host group where the playbook will be executed.
-- **Variables**: Defines variables used in the playbook, loaded from `vars.yml`.
-- **Tasks**:
-  - Sets up directories for Docker volume mapping.
-  - Installs Docker.
-  - Pulls the WireGuard Docker image.
-  - Runs the WireGuard container with specified environment variables and settings.
-  - Fetches peer configuration files and QR code files to the local machine for distributing to VPN clients.
+- `user_dir`: Directory on the VM for Docker volume mapping.
+- `number_of_peers`: Number of peer configurations to create.
+- `server_mtu_value`: MTU value for the server.
+- `peer_mtu_value`: MTU value for the peers.
+- `path_to_save_configs`: Local path to save the peer configurations and QR codes.
 
-The `ansible.cfg` file contains configuration settings for Ansible, including the path to the inventory file, SSH key, and remote user.
+```yaml
+user_dir: "/home/{{ ansible_env.USER }}/wireguard"
+number_of_peers: 3
+server_mtu_value: 1420
+peer_mtu_value: 1420
+path_to_save_configs: "/home/{{ lookup('env', 'USER') }}/Desktop"
+```
 
-The `vars.yml` file contains variables used in the playbook, such as the directory paths and the number of VPN peers.
-
-## Deployment
-
-### Terraform Deployment
-
-Refer to the previous README section on Terraform deployment.
-
-### Ansible Setup
+### Playbook Execution
 
 1. Ensure the VMs are up and running and that you can SSH into them.
-2. Update the `inventory.ini` file with the IP addresses of the VMs.
-3. Run the following command to execute the Ansible playbook and set up WireGuard on the VMs:
-   ```bash
-   ansible-playbook docker-wg.yml
-   ```
+2. The `templates/hosts.ini.tpl` file should create and update a `hosts.ini` file with the IP addresses of the VMs.
+3. Navigate to the `wg` directory where the `docker-wg.yml` file is located.
+4. Run the following command to execute the Ansible playbook and set up WireGuard on the VMs:
+
+```bash
+ansible-playbook wg/docker-wg.yml
+```
+
+The playbook performs various tasks including setting up directories for Docker volume mapping, installing Docker, pulling the WireGuard Docker image, running the WireGuard container with specified environment variables and settings, copying and executing scripts to update MTU values, and fetching peer configuration and QR code files to the local machine.
+
+## Headscale Installation and Configuration with Ansible
+
+### Directory Structure
+   
+   ```plaintext
+   ├── headscale
+│   ├── install_headscale.yml
+│   └── vars
+├── templates
+│   ├── config_template.yaml
+│   ├── hosts.ini.tpl
+│   └── main.yml.tpl
+  ```
+
+Headscale is an open-source implementation of the Tailscale control server. The `install_headscale.yml` playbook automates the installation and configuration of Headscale on your VMs.
+
+### Directory Structure
+
+Under the `playbooks` directory, you will find the `headscale` directory which contains the `install_headscale.yml` playbook. The `templates` directory contains template files used by the playbook:
+
+- `config_template.yaml`: Template for Headscale configuration.
+- `hosts.ini.tpl`: Template for updating the hosts file.
+- `main.yml.tpl`: Template for some main configurations.
+
+### Playbook Breakdown
+
+The `install_headscale.yml` playbook performs the following tasks:
+
+1. **Include VM-specific variables**: Loads VM-specific variables from the `vars` directory.
+2. **Download Headscale package**: Downloads the Headscale Debian package from GitHub.
+3. **Install Headscale**: Installs the Headscale package using the `apt` module.
+4. **Enable Headscale service**: Enables the Headscale service to start on boot.
+5. **Create Backup Headscale configuration**: Creates a backup of the existing Headscale configuration file.
+6. **Configure Headscale**: Applies configuration from `config_template.yaml`.
+7. **Start Headscale**: Starts the Headscale service.
+
+### Configuration Templates
+
+The configuration templates use variable substitution to customize the configuration based on your environment these will be populated after the terraform apply command is executed.:
+
+- `config_template.yaml`: Includes settings for server URL, listening address, and other Headscale configurations.
+- `hosts.ini.tpl`: Used to update the hosts file with the IP addresses of your VMs.
+- `main.yml.tpl`: Contains some main configurations like server URL, listening address, and others which are used by Headscale.
+
+### Executing the Playbook
+
+To execute the playbook, navigate to the `playbooks` directory and run the following command:
+
+```bash
+ansible-playbook headscale/install_headscale.yml
+```
 
 ## Clean Up
 
@@ -104,4 +173,3 @@ To destroy the deployed resources, you can use the following command:
 ```bash
 terraform destroy
 ```
-

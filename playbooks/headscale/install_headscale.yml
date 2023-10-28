@@ -1,0 +1,41 @@
+---
+- name: Install Headscale
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Include VM-specific vars
+      include_vars:
+        file: "{{ playbook_dir }}/vars/{{ ansible_hostname }}_main.yml"
+
+    - name: Download Headscale package
+      get_url:
+        url: "https://github.com/juanfont/headscale/releases/download/v0.22.3/headscale_0.22.3_linux_amd64.deb"
+        dest: "/tmp/headscale.deb"
+
+    - name: Install Headscale
+      apt:
+        deb: "/tmp/headscale.deb"
+
+    - name: Enable Headscale service
+      systemd:
+        name: headscale
+        enabled: yes
+
+    - name: Create Backup Headscale configuration
+      ansible.builtin.shell:
+        cmd: |
+          cp /etc/headscale/config.yaml /etc/headscale/config.yaml.bak
+
+    - name: Configuration Headscale
+      template:
+        src:  "{{ playbook_dir }}/../templates/config_template.yaml"
+        dest: /etc/headscale/config.yaml
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Start Headscale
+      systemd:
+        name: headscale
+        state: started

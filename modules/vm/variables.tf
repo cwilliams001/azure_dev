@@ -19,6 +19,12 @@ variable "vm_count" {
   default     = 1
 }
 
+variable "vm_name_prefix" {
+  description = "The prefix for the VM names."
+  type        = string
+  default     = "dev-vm"
+}
+
 variable "admin_username"{
   description = "The username of the admin user."
   type        = string

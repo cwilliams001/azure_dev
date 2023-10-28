@@ -18,6 +18,17 @@ variable "vm_count" {
   type        = number
 }
 
+variable "vm_name_prefix" {
+  description = "The prefix for the VM names."
+  type        = string
+  default     = "dev-vm"
+}
+
+variable "admin_username" {
+  description = "The admin username for the VMs."
+  type        = string
+}
+
 variable "ssh_public_key_path" {
   description = "The file path of the SSH public key to be used for the VMs."
   type        = string
@@ -31,4 +42,10 @@ variable "record_prefix" {
 variable "domain_name" {
   description = "The domain name for the DNS zone."
   type        = string
+}
+
+variable "acme_email" {
+  description = "The email address to use for Let's Encrypt."
+  type        = string
+
 }

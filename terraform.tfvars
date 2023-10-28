@@ -1,7 +1,10 @@
-environment_tag     = "dev"
-resource_group_name = "dev-rg"
-location            = "East US"
+environment_tag     = "dev"     # dev, qa, prod
+resource_group_name = "dev-rg"  # resource group name
+location            = "East US" # Azure region
+vm_name_prefix      = "dev-vm"  # prefix for VM names
 vm_count            = 2
+admin_username      = "adminuser"
 ssh_public_key_path = "~/.ssh/dev-azure.pub"
-record_prefix       = "subdomain_name"
-domain_name         = "Your Domain Name"
+record_prefix       = "wg" # Record prefix for DNS records example wg-dev-vm-01.your_domain.com
+domain_name         = "your_domain.com"
+acme_email          = "admin@your_domain.com"
