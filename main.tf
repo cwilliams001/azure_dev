@@ -67,8 +67,22 @@ resource "azurerm_subnet_network_security_group_association" "dev-sga" {
   network_security_group_id = azurerm_network_security_group.dev-nsg.id
 }
 
+resource "azurerm_dns_zone" "dev-dns-zone" {
+  name                = "your_domain_name"  // Replace with your domain
+  resource_group_name = azurerm_resource_group.dev-rg.name
+}
+
+resource "azurerm_dns_a_record" "dev-a-record" {
+    for_each = { for name, pip in azurerm_public_ip.dev-pip : name => pip.ip_address}
+  name                = "hs-${each.key}"  // This will create subdomains like hs-dev-vm-01, hs-dev-vm-02, etc.
+  zone_name           = azurerm_dns_zone.dev-dns-zone.name
+  resource_group_name = azurerm_resource_group.dev-rg.name
+  ttl                 = 300
+  records             = [each.value]  // Replace with one of your VMs, or adjust to use a loop if necessary
+}
+
 locals {
-  vm_count = 3 # Adjust this number to create more VMs
+  vm_count = 2 # Adjust this number to create more VMs
   vm_names = toset(formatlist("dev-vm-%02d", range(1, local.vm_count + 1)))
 }
 
@@ -78,7 +92,7 @@ resource "azurerm_public_ip" "dev-pip" {
   name                = "${each.key}-pip"
   location            = azurerm_resource_group.dev-rg.location
   resource_group_name = azurerm_resource_group.dev-rg.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
 
   tags = {
     environment = "dev"
@@ -141,4 +155,12 @@ resource "azurerm_linux_virtual_machine" "dev-vm" {
 output "public_ips" {
   value = { for name, pip in azurerm_public_ip.dev-pip : name => pip.ip_address }
   description = "The public IP addresses of the VMs"
+}
+
+output "dns_zone_info" {
+  value = {
+    name        = azurerm_dns_zone.dev-dns-zone.name
+    name_servers = azurerm_dns_zone.dev-dns-zone.name_servers
+  }
+  description = "The name and name servers of the DNS zone"
 }
