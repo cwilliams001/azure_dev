@@ -53,6 +53,13 @@
           - "/etc/localtime:/etc/localtime:ro"
         sysctls:
           net.ipv4.conf.all.src_valid_mark: "1"
+
+    - name: Add PersistentKeepalive to peer configuration files
+      lineinfile:
+          path: "{{ user_dir }}/config/peer{{ item }}/peer{{ item }}.conf"
+          line: "PersistentKeepalive = 25"
+          create: no
+      loop: "{{ range(1, number_of_peers + 1)|list }}"      
     
     - name: Copy MTU update scripts to target
       template:

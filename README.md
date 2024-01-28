@@ -166,9 +166,15 @@ To execute the playbook, navigate to the `playbooks` directory and run the follo
 ansible-playbook headscale/install_headscale.yml
 ```
 
+or
+
+```bash
+ansible-playbook wg/docker-wg.yml
+```
+
 ## Clean Up
 
-To destroy the deployed resources, you can use the following command:
+To destroy the deployed resources, you can use the following command frome the azure_dev directory:
 
 ```bash
 terraform destroy
